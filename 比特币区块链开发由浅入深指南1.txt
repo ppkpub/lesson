@@ -1,0 +1,96 @@
+本文以调用Blockchain.info所提供的API服务结合Node.js为例来说明如何搭建相关的开发环境和开发代码示例。
+
+
+一、确认基础环境
+
+操作系统：建议采用虚拟机形式安装Ubuntu 14.04 Desktop 64bit
+          其他操作系统可以参考本文自行试验。
+
+Node.js:  Blockchain.info要求 node >= 0.12.0  npm >= 2.12.0, < 3.0.0
+
+查看现有node.js版本的命令参考如下：
+    apt-cache policy nodejs
+    node -v
+    npm -v
+
+如果尚未安装nodejs，可以参考下述命令进行安装:
+sudo add-apt-repository 'deb https://deb.nodesource.com/node trusty main'
+sudo apt-get update
+sudo apt-get install nodejs
+    
+如果已安装的nodejs版本不符合上面的要求，可从nodejs.org网站上手工下载较新版本（目前建议用0.12.10版本）的压缩包，解压后用命令行进入解压后的目录，输入以下命令覆盖旧版本
+sudo cp  bin/* /usr/bin/
+sudo cp -r lib/include /usr/include/
+sudo cp -r lib/node_modules /usr/lib/
+node -v
+npm -v
+
+二、申请apicode:  
+访问Blockchain.info的下述网址申请接口授权码（apicode）：
+    https://blockchain.info/api/api_create_code
+提交申请后，等待两个工作日后可以收到内含接口授权码的邮件，将其中的Code对应的后面字符串复制保存好，后续的安装配置和开发都需要用到。
+
+三、安装Blockchain Wallet API服务程序
+在命令行下输入以下命令：
+    sudo npm install -g blockchain-wallet-service
+
+检查所安装的Blockchain Wallet API版本：
+    blockchain-wallet-service -V
+
+如果需要更新到最新版本，可以输入以下命令：
+sudo npm update -g blockchain-wallet-service
+
+
+四、配置Blockchain Wallet API服务程序
+输入以下命令启动WalletApi服务: 
+    blockchain-wallet-service start --port 3000
+
+
+创建一个新钱包账户，需输入以下命令：
+curl “http://localhost:3000/api/v2/create?password=YourWalletPassword&api_code=YourApiCode&label=YourWalletName”
+其中： YourWalletPassword是给新钱包设置的密码,一般用英文数字组合，长度在8位字符以上就可以。
+       YourApiCode是前面申请的接口授权码，复制到这里填上就行。
+       YourWalletName是给新钱包起的名称，一般用英文数字组合
+
+如果操作成功，会显示结果类似： {"guid":"xxxxxxxx-xxxxxx-xxxxxxx-xxxxxxxx","address":"xxxxxxxxxxxxxxxxxxxxx","label":"xxxxx"}
+将其中的钱包账户标识guid和钱包地址address都记下来，后续操作需要用到。
+这里显示的address对应的就是新钱包的比特币地址，可以从别的比特币钱包向这个新地址发送少量比特币（比如0.01 BTC）用于后续测试。
+注：获得少量比特币可以从国内的一些比特币交易所用人民币来购买然后转账到自己的比特币钱包地址即可。国内常用的交易所有：比特币中国，比特时代，okcoin等，从网上搜索下即可了解到具体操作方法。
+
+获取钱包余额，需输入以下命令：
+curl "http://localhost:3000/merchant/YourGuid/balance?password=YourWalletPassword&api_code=YourApiCode"
+其中： YourGuid是前面创建钱包账户时获得的guid标识
+       YourWalletPassword是前面设置的钱包密码
+       YourApiCode是前面申请的接口授权码。
+
+如果操作成功，会显示结果类似： {"balance":xxxxxxx} 
+其中的balance是一个整数，单位为Satoshi(聪)，1 Satoshi=0.00000001 BTC
+
+五、安装API的客户端支持库
+本文以Node.js为例，Blockchain.info也提供另外多种语言的API库如PHP，JAVA，.NET(C#)，Ruby,Python等，读者可以自行参考选用。
+
+在命令行下输入以下命令：
+sudo npm install --save blockchain.info
+
+关于API的node支持库的详细说明： https://github.com/blockchain/api-v1-client-node
+
+六、编写第一个程序“Hello,Bitcoin”
+
+第一个示例程序HelloBitcoin.js源码如下：
+/******************  START  *********************/
+//Hello Bitcoin Demo of node.js
+console.log('Hello, Bitcoin.');
+
+//init wallet object
+var MyWallet = require('blockchain.info/MyWallet');
+var options = { apiCode: '你申请的ApiCode', apiHost: 'http://localhost:3000' };
+var wallet = new MyWallet('钱包Guid', '钱包密码Password', options);
+
+//show balance
+wallet.getBalance().then(function (balance) { console.log('Wallet balance is %d!', balance); });
+
+/********************* END ************************/
+
+将你前面获得的相关配置参数包括apicode,guid和password填入以上代码中，保存后即可运行: node HelloBitcoin.js
+
+在此程序的基础上，经过对相关API的了解，我们可以进一步开发出更多功能，如查询钱包地址列表，发送比特币，发送特定交易数据包（如多重签名数据）等等，后续我们PPkPub将深入介绍。
