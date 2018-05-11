@@ -25,11 +25,16 @@ $docker --version
 
 二、安装和运行比特币测试网络(bitcoin-testnet)
 
-1.下载比特币测试网络(bitcoin-testnet)的Docker镜像
-$sudo docker pull freewil/bitcoin-testnet-box
+1.下载源码自行构建比特币测试网络(bitcoin-testnet)的Docker镜像
+$git clone http://www.github.com/freewil/bitcoin-testnet-box
+
+$cd bitcoin-testnet-box
+
+$sudo docker build -t bitcoin-testnet-box .
+
 
 2.运行Docker镜像
-$sudo docker run -t -i -p 19001:19001 -p 19011:19011 freewil/bitcoin-testnet-box
+$sudo docker run -t -i -p 19001:19001 -p 19011:19011 bitcoin-testnet-box
 
 注：上述命令中的19001和19011是配置给两个节点提供RPC服务的端口。
 
@@ -37,46 +42,138 @@ $sudo docker run -t -i -p 19001:19001 -p 19011:19011 freewil/bitcoin-testnet-box
 $ make start
 启动成功后，将在本机模拟运行两个比特币测试钱包节点，组成一个私有范围的比特币测试网络。
 
-输入下面的命令可以查看测试网络节点状态信息:
-$ make getinfo
-
+输入下面的命令可以查看区块信息:
+$ bitcoin-cli -datadir=1   getblockchaininfo
 显示的提示信息如下，中文为对其中若干关键信息的说明：
-bitcoin-cli -datadir=1  getinfo   //第一个钱包节点的信息
 {
-  "version": 120100,      //此客户端节点软件版本
-  "protocolversion": 70012,  //比特币协议版本
-  "walletversion": 60000,   //钱包数据格式版本
-  "balance": 0.00000000,  //第一个钱包节点的账户余额，初始为0
-  "blocks": 0,          //已经同步的区块数量，初始启动为0，可以通过进一步的命令来模拟生成区块数据
-  "timeoffset": 0,      //时间的时区偏移量
-  "connections": 1,     //本节点接入的其他节点数量
-  "proxy": "",          //网络代理设置 
-  "difficulty": 4.656542373906925e-10,  //当前挖矿计算难度
-  "testnet": false,     //是否使用公开的比特币测试网络,取值false为“否”，即只建立私有测试环境
-  "keypoololdest": 1467253951, //预生成的公匙和私匙的起始时间
-  "keypoolsize": 101,  //预生成的公匙和私匙池的包含记录数量，用于生成钱包地址和找零地址，这样钱包备份可以对已有的交易以及未来多笔交易有效
-  "paytxfee": 0.00000000, //每次发送比特币的时候选择支付的一个可选的额外的、每KB字节的交易手续费。包含额外手续费的交易会更快的被包含在新生成的区块中，因此会更快生效
-  "relayfee": 0.00001000, //每笔交易支付给矿工的最少的标准手续费
-  "errors": ""    //节点错误提示
+  "chain": "regtest",
+  "blocks": 0,   //已经同步的区块数量，初始启动为0，可以通过进一步的命令来模拟生成区块数据
+  "headers": 0,
+  "bestblockhash": "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206",  //最优链的最新区块哈希值
+  "difficulty": 4.656542373906925e-10,    //当前挖矿计算难度
+  "mediantime": 1296688602,
+  "verificationprogress": 1,
+  "initialblockdownload": true,
+  "chainwork": "0000000000000000000000000000000000000000000000000000000000000002",
+  "size_on_disk": 293,
+  "pruned": false,
+  "softforks": [
+    {
+      "id": "bip34",
+      "version": 2,
+      "reject": {
+        "status": false
+      }
+    },
+    {
+      "id": "bip66",
+      "version": 3,
+      "reject": {
+        "status": false
+      }
+    },
+    {
+      "id": "bip65",
+      "version": 4,
+      "reject": {
+        "status": false
+      }
+    }
+  ],
+  "bip9_softforks": {
+    "csv": {
+      "status": "defined",
+      "startTime": 0,
+      "timeout": 9223372036854775807,
+      "since": 0
+    },
+    "segwit": {
+      "status": "active",
+      "startTime": -1,
+      "timeout": 9223372036854775807,
+      "since": 0
+    }
+  },
+  "warnings": ""
 }
-bitcoin-cli -datadir=2  getinfo    //第二个钱包节点的信息
+
+
+输入下面的命令可以查看指定网络节点状态信息:
+$ bitcoin-cli -datadir=1   getnetworkinfo
+显示的提示信息如下，中文为对其中若干关键信息的说明：
 {
-  "version": 120100,
-  "protocolversion": 70012,
-  "walletversion": 60000,
+  "version": 160000,                 //此客户端节点软件版本
+  "subversion": "/Satoshi:0.16.0/",  
+  "protocolversion": 70015,          //比特币协议版本
+  "localservices": "000000000000040d",
+  "localrelay": true,
+  "timeoffset": 0,                   //时间的时区偏移量
+  "networkactive": true,
+  "connections": 1,                  //本节点接入的其他对等节点数量
+  "networks": [
+    {
+      "name": "ipv4",
+      "limited": false,
+      "reachable": true,
+      "proxy": "",
+      "proxy_randomize_credentials": false
+    },
+    {
+      "name": "ipv6",
+      "limited": false,
+      "reachable": true,
+      "proxy": "",
+      "proxy_randomize_credentials": false
+    },
+    {
+      "name": "onion",
+      "limited": true,
+      "reachable": false,
+      "proxy": "",
+      "proxy_randomize_credentials": false
+    }
+  ],
+  "relayfee": 0.00001000,    //每笔交易支付给矿工的最少的标准手续费
+  "incrementalfee": 0.00001000,
+  "localaddresses": [
+  ],
+  "warnings": ""
+}
+
+
+输入下面的命令可以查看指定第一个钱包节点的钱包信息:
+$ bitcoin-cli -datadir=1   getwalletinfo
+显示的提示信息如下，中文为对其中若干关键信息的说明：
+{
+  "walletname": "wallet.dat",    //钱包文件名称
+  "walletversion": 159900,       //钱包数据格式版本
+  "balance": 0.00000000,         //指定钱包节点的账户余额，初始为0
+  "unconfirmed_balance": 0.00000000,  //尚未确认的交易余额，初始为0
+  "immature_balance": 0.00000000,     //挖矿得到尚未生效的奖励余额，初始为0
+  "txcount": 0,                       //关联的交易数量
+  "keypoololdest": 1526042010,        //预生成的公匙和私匙的起始时间
+  "keypoolsize": 1000,                //预生成的公匙和私匙池的包含记录数量，用于生成钱包地址和找零地址，这样钱包备份可以对已有的交易以及未来多笔交易有效
+  "keypoolsize_hd_internal": 1000,
+  "paytxfee": 0.00000000,      //每次发送比特币的时候选择支付的一个可选的额外的、每KB字节的交易手续费。包含额外手续费的交易会更快的被包含在新生成的区块中，因此会更快生效
+  "hdmasterkeyid": "86c54343ca1b4de6f1c837d736b63e986d679060"
+}
+
+输入下面的命令可以查看指定第二个钱包节点的钱包信息，说明同上:
+$bitcoin-cli -datadir=2  getwalletinfo   
+{
+  "walletname": "wallet.dat",
+  "walletversion": 159900,
   "balance": 0.00000000,
-  "blocks": 0,
-  "timeoffset": 0,
-  "connections": 1,
-  "proxy": "",
-  "difficulty": 4.656542373906925e-10,
-  "testnet": false,
-  "keypoololdest": 1467253951,
-  "keypoolsize": 101,
+  "unconfirmed_balance": 0.00000000,
+  "immature_balance": 0.00000000,
+  "txcount": 0,
+  "keypoololdest": 1526042010,
+  "keypoolsize": 1000,
+  "keypoolsize_hd_internal": 1000,
   "paytxfee": 0.00000000,
-  "relayfee": 0.00001000,
-  "errors": ""
+  "hdmasterkeyid": "ff94f9e16cfd6d15a54f4c82e3fc418c5f7a5882"
 }
+
 
 
 4.初始化和测试区块链数据
@@ -89,7 +186,7 @@ make generate
 make generate BLOCKS=200
 //说明：模拟新产生200个区块记录
 
-make getinfo
+bitcoin-cli -datadir=1   getwalletinfo
 //说明：查看最新的钱包状态包括余额信息，这时可以留意看到第一个钱包节点的账户余额变为了 5050.00000000 BTC，即通过模拟区块挖矿产生的测试比特币。
 
 make sendfrom1 ADDRESS=mkiytxYA6kxUC8iTnzLPgMfCphnz91zRfZ AMOUNT=10
@@ -98,7 +195,7 @@ make sendfrom1 ADDRESS=mkiytxYA6kxUC8iTnzLPgMfCphnz91zRfZ AMOUNT=10
 make generate BLOCKS=10
 //说明：模拟新产生10个区块记录，让上面的转账交易得到足够有效的确认 
 
-make getinfo
+bitcoin-cli -datadir=1   getwalletinfo
 //说明：查看最新的钱包状态包括余额信息, 这时可以留意看到第一个钱包节点的账户余额变为了 5539.99996160 BTC ，即已经交易转账支出了10个BTC加上少许的矿工费用。
 
 
