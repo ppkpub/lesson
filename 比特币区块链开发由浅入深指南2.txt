@@ -46,17 +46,17 @@ $ make start
 $ bitcoin-cli -datadir=1   getblockchaininfo
 显示的提示信息如下，中文为对其中若干关键信息的说明：
 {
-  "chain": "regtest",
+  "chain": "regtest", //当前区块链的名称
   "blocks": 0,   //已经同步的区块数量，初始启动为0，可以通过进一步的命令来模拟生成区块数据
-  "headers": 0,
-  "bestblockhash": "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206",  //最优链的最新区块哈希值
+  "headers": 0,  //已经验证的区块头数量，初始启动为0
+  "bestblockhash": "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206",  //最优链的最新区块哈希值，初始为创世区块的哈希值
   "difficulty": 4.656542373906925e-10,    //当前挖矿计算难度
-  "mediantime": 1296688602,
-  "verificationprogress": 1,
-  "initialblockdownload": true,
-  "chainwork": "0000000000000000000000000000000000000000000000000000000000000002",
-  "size_on_disk": 293,
-  "pruned": false,
+  "mediantime": 1296688602,    //median time for the current best block
+  "verificationprogress": 1,   //estimate of verification progress [0..1]
+  "initialblockdownload": true,  
+  "chainwork": "0000000000000000000000000000000000000000000000000000000000000002",  //total amount of work in active chain, in hexadecimal
+  "size_on_disk": 293,   //占用存储空间大小,单位kB
+  "pruned": false,   //if the blocks are subject to pruning
   "softforks": [
     {
       "id": "bip34",
@@ -97,26 +97,28 @@ $ bitcoin-cli -datadir=1   getblockchaininfo
   "warnings": ""
 }
 
+关于bitcoin-cli命令的更多信息可以参考: https://zhuanlan.zhihu.com/p/33646695
+
 
 输入下面的命令可以查看指定网络节点状态信息:
 $ bitcoin-cli -datadir=1   getnetworkinfo
 显示的提示信息如下，中文为对其中若干关键信息的说明：
 {
   "version": 160000,                 //此客户端节点软件版本
-  "subversion": "/Satoshi:0.16.0/",  
+  "subversion": "/Satoshi:0.16.0/",  // the server subversion string
   "protocolversion": 70015,          //比特币协议版本
-  "localservices": "000000000000040d",
-  "localrelay": true,
+  "localservices": "000000000000040d",  //the services we offer to the network
+  "localrelay": true,                //true if transaction relay is requested from peers
   "timeoffset": 0,                   //时间的时区偏移量
-  "networkactive": true,
-  "connections": 1,                  //本节点接入的其他对等节点数量
+  "networkactive": true,             //P2P网络是否有效
+  "connections": 1,                  //本节点所连接的其他对等节点数量
   "networks": [
     {
-      "name": "ipv4",
-      "limited": false,
-      "reachable": true,
-      "proxy": "",
-      "proxy_randomize_credentials": false
+      "name": "ipv4",                //network (ipv4, ipv6 or onion)
+      "limited": false,              //is the network limited using -onlynet?
+      "reachable": true,             //is the network reachable?
+      "proxy": "",                   //the proxy that is used for this network, or empty if none
+      "proxy_randomize_credentials": false  //Whether randomized credentials are used
     },
     {
       "name": "ipv6",
@@ -133,11 +135,11 @@ $ bitcoin-cli -datadir=1   getnetworkinfo
       "proxy_randomize_credentials": false
     }
   ],
-  "relayfee": 0.00001000,    //每笔交易支付给矿工的最少的标准手续费
-  "incrementalfee": 0.00001000,
+  "relayfee": 0.00001000,    //每笔交易支付给矿工的手续费标准，单位BTC/kB
+  "incrementalfee": 0.00001000, //minimum fee increment for mempool limiting or BIP 125 replacement in BTC/kB
   "localaddresses": [
   ],
-  "warnings": ""
+  "warnings": ""     //any network warnings
 }
 
 
